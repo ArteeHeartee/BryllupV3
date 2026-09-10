@@ -1687,11 +1687,49 @@ document.addEventListener(
 
 
 /*
-  RSVP-SKJEMA
+  =========================================================
+  RSVP — GJESTESØK OG INVITASJON
+  =========================================================
 */
+
 const rsvpForm =
   document.querySelector(
     "[data-rsvp-form]"
+  );
+
+const guestSearchInput =
+  document.querySelector(
+    "[data-guest-search]"
+  );
+
+const guestSearchResults =
+  document.querySelector(
+    "[data-guest-search-results]"
+  );
+
+const rsvpDetails =
+  document.querySelector(
+    "[data-rsvp-details]"
+  );
+
+const rsvpGuestList =
+  document.querySelector(
+    "[data-rsvp-guest-list]"
+  );
+
+const attendanceYes =
+  document.querySelector(
+    "[data-attendance-yes]"
+  );
+
+const attendanceNo =
+  document.querySelector(
+    "[data-attendance-no]"
+  );
+
+const rsvpAdditionalFields =
+  document.querySelector(
+    "[data-rsvp-additional-fields]"
   );
 
 const formStatus =
@@ -1700,11 +1738,25 @@ const formStatus =
   );
 
 
+/*
+  ---------------------------------------------------------
+  STATE
+  ---------------------------------------------------------
+*/
+
+let selectedGuest = null;
+
+
+/*
+  ---------------------------------------------------------
+  FORM STATUS
+  ---------------------------------------------------------
+*/
+
 const setFormStatus = (
   message,
   type = ""
 ) => {
-
   if (!formStatus) {
     return;
   }
@@ -1716,171 +1768,646 @@ const setFormStatus = (
     "form-status";
 
   if (type) {
-
     formStatus.classList.add(
       type
     );
+  }
+};
 
+
+/*
+  ---------------------------------------------------------
+  GJESTESØK
+  ---------------------------------------------------------
+*/
+
+const renderGuestSearchResults = (
+  guests
+) => {
+  if (
+    !guestSearchResults ||
+    !guestSearchInput
+  ) {
+    return;
   }
 
-};
+  guestSearchResults.innerHTML = "";
 
+  if (!guests.length) {
+    guestSearchResults.setAttribute(
+      "aria-hidden",
+      "true"
+    );
 
-const formDataToObject = (
-  formData
-) => {
+    guestSearchInput.setAttribute(
+      "aria-expanded",
+      "false"
+    );
 
-  const result = {};
+    return;
+  }
 
+  guests.forEach((guest) => {
+    const button =
+      document.createElement(
+        "button"
+      );
 
-  formData.forEach(
-    (value, key) => {
+    button.type = "button";
 
-      result[key] = value;
+    button.className =
+      "guest-search-option";
 
-    }
+    button.setAttribute(
+      "role",
+      "option"
+    );
+
+    button.dataset.guestId =
+      guest.id;
+
+    button.innerHTML = `
+      <span class="guest-search-option-name">
+        ${guest.name}
+      </span>
+    `;
+
+    button.addEventListener(
+      "click",
+      () => {
+        selectGuest(
+          guest.id
+        );
+      }
+    );
+
+    guestSearchResults.appendChild(
+      button
+    );
+  });
+
+  guestSearchResults.setAttribute(
+    "aria-hidden",
+    "false"
   );
 
-
-  return result;
-
+  guestSearchInput.setAttribute(
+    "aria-expanded",
+    "true"
+  );
 };
 
 
-if (rsvpForm) {
+/*
+  ---------------------------------------------------------
+  GJESTELISTE I RSVP
+  ---------------------------------------------------------
+*/
 
-  rsvpForm.addEventListener(
-    "submit",
-    async (event) => {
+const renderInvitationGuests = (
+  guests
+) => {
+  if (!rsvpGuestList) {
+    return;
+  }
 
-      event.preventDefault();
+  rsvpGuestList.innerHTML = "";
 
+  guests.forEach((guest) => {
+    const wrapper =
+      document.createElement(
+        "div"
+      );
 
-      if (!rsvpForm.checkValidity()) {
+    wrapper.className =
+      "rsvp-guest";
 
-        rsvpForm.reportValidity();
+    if (
+      selectedGuest &&
+      guest.id !== selectedGuest.id
+    ) {
+      wrapper.classList.add(
+        "rsvp-guest-locked"
+      );
+    }
 
-        return;
+    const name =
+      document.createElement(
+        "span"
+      );
 
-      }
+    name.className =
+      "rsvp-guest-name";
 
+    name.textContent =
+      guest.name;
 
-      const submitButton =
-        rsvpForm.querySelector(
-          ".form-submit"
+    wrapper.appendChild(
+      name
+    );
+
+    if (
+      selectedGuest &&
+      guest.id === selectedGuest.id
+    ) {
+      const label =
+        document.createElement(
+          "small"
         );
 
+      label.className =
+        "rsvp-guest-label";
+
+      label.textContent =
+        "Deg";
+
+      wrapper.appendChild(
+        label
+      );
+    } else {
+      const label =
+        document.createElement(
+          "small"
+        );
+
+      label.className =
+        "rsvp-guest-label";
+
+      label.textContent =
+        "Invitert med deg";
+
+      wrapper.appendChild(
+        label
+      );
+    }
+
+    rsvpGuestList.appendChild(
+      wrapper
+    );
+  });
+};
+
+
+/*
+  ---------------------------------------------------------
+  NULLSTILL RSVP
+  ---------------------------------------------------------
+*/
+
+const resetRsvpSelection = () => {
+  selectedGuest = null;
+
+  if (rsvpDetails) {
+    rsvpDetails.hidden = true;
+  }
+
+  if (rsvpAdditionalFields) {
+    rsvpAdditionalFields.hidden = true;
+  }
+
+  if (rsvpGuestList) {
+    rsvpGuestList.innerHTML = "";
+  }
+
+  if (guestSearchResults) {
+    guestSearchResults.innerHTML = "";
+
+    guestSearchResults.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+  }
+
+  if (guestSearchInput) {
+    guestSearchInput.readOnly = false;
+
+    guestSearchInput.removeAttribute(
+      "data-selected-guest"
+    );
+
+    guestSearchInput.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+  }
+
+  if (attendanceYes) {
+    attendanceYes.checked = false;
+    attendanceYes.required = false;
+  }
+
+  if (attendanceNo) {
+    attendanceNo.checked = false;
+    attendanceNo.required = false;
+  }
+
+  if (rsvpForm) {
+    const conditionalFields =
+      rsvpForm.querySelectorAll(
+        "[data-rsvp-additional-fields] textarea, [data-rsvp-additional-fields] input"
+      );
+
+    conditionalFields.forEach(
+      (field) => {
+        field.value = "";
+      }
+    );
+  }
+
+  setFormStatus("");
+};
+
+
+/*
+  ---------------------------------------------------------
+  VELG GJEST
+  ---------------------------------------------------------
+*/
+
+const selectGuest = (
+  guestId
+) => {
+  const guest =
+    getGuestById(
+      guestId
+    );
+
+  if (!guest) {
+    return;
+  }
+
+  const invitationGuests =
+    getInvitationGuests(
+      guest.invitationId
+    );
+
+  selectedGuest = guest;
+
+  if (guestSearchInput) {
+    guestSearchInput.value =
+      guest.name;
+
+    guestSearchInput.readOnly =
+      true;
+
+    guestSearchInput.dataset.selectedGuest =
+      guest.id;
+
+    guestSearchInput.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+  }
+
+  if (guestSearchResults) {
+    guestSearchResults.innerHTML = "";
+
+    guestSearchResults.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+  }
+
+  renderInvitationGuests(
+    invitationGuests
+  );
+
+  if (rsvpDetails) {
+    rsvpDetails.hidden = false;
+  }
+
+  /*
+    Antall inviterte bestemmes nå av
+    gjesteregisteret — aldri av gjesten.
+  */
+  const partySize =
+    invitationGuests.length;
+
+  if (partySize !== guest.partySize) {
+    console.warn(
+      "Uoverensstemmelse i partySize:",
+      {
+        guest,
+        invitationGuests
+      }
+    );
+  }
+
+  /*
+    Når personen er identifisert,
+    må de svare på om de kommer.
+  */
+  if (attendanceYes) {
+    attendanceYes.required =
+      true;
+  }
+
+  if (attendanceNo) {
+    attendanceNo.required =
+      true;
+  }
+
+  setFormStatus("");
+};
+
+
+/*
+  ---------------------------------------------------------
+  VIS / SKJUL EKSTRA FELTER
+  ---------------------------------------------------------
+*/
+
+const updateAdditionalFieldsVisibility = () => {
+  if (
+    !rsvpAdditionalFields ||
+    !attendanceYes ||
+    !attendanceNo
+  ) {
+    return;
+  }
+
+  const attending =
+    attendanceYes.checked;
+
+  rsvpAdditionalFields.hidden =
+    !attending;
+
+  if (!attending) {
+    const conditionalFields =
+      rsvpAdditionalFields.querySelectorAll(
+        "textarea, input"
+      );
+
+    conditionalFields.forEach(
+      (field) => {
+        field.value = "";
+        field.checked = false;
+      }
+    );
+  }
+};
+
+
+/*
+  ---------------------------------------------------------
+  NAVNESTEKST
+  ---------------------------------------------------------
+*/
+
+if (guestSearchInput) {
+  guestSearchInput.addEventListener(
+    "input",
+    () => {
+      /*
+        Hvis gjesten allerede er valgt og
+        begynner å endre teksten, starter vi
+        identifiseringen på nytt.
+      */
+      if (selectedGuest) {
+        resetRsvpSelection();
+      }
+
+      const query =
+        guestSearchInput.value;
+
+      const normalizedQuery =
+        normalizeGuestSearch(
+          query
+        );
+
+      /*
+        Ingen forslag før minimum
+        fire bokstaver.
+      */
+      if (
+        normalizedQuery.length < 4
+      ) {
+        renderGuestSearchResults(
+          []
+        );
+
+        return;
+      }
+
+      const matches =
+        searchGuests(
+          query
+        );
+
+      renderGuestSearchResults(
+        matches
+      );
+    }
+  );
+}
+
+
+/*
+  ---------------------------------------------------------
+  TASTATURNAVIGASJON
+  ---------------------------------------------------------
+*/
+
+if (guestSearchInput) {
+  guestSearchInput.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        event.key === "Escape"
+      ) {
+        if (guestSearchResults) {
+          guestSearchResults.innerHTML = "";
+
+          guestSearchResults.setAttribute(
+            "aria-hidden",
+            "true"
+          );
+        }
+
+        guestSearchInput.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+
+        return;
+      }
+
+      /*
+        ENTER skal ikke sende skjemaet
+        dersom en gjest fortsatt må velges.
+      */
+      if (
+        event.key === "Enter" &&
+        !selectedGuest
+      ) {
+        event.preventDefault();
+      }
+    }
+  );
+}
+
+
+/*
+  ---------------------------------------------------------
+  RSVP — KOMMER / KOMMER IKKE
+  ---------------------------------------------------------
+*/
+
+if (attendanceYes) {
+  attendanceYes.addEventListener(
+    "change",
+    updateAdditionalFieldsVisibility
+  );
+}
+
+if (attendanceNo) {
+  attendanceNo.addEventListener(
+    "change",
+    updateAdditionalFieldsVisibility
+  );
+}
+
+
+/*
+  ---------------------------------------------------------
+  LUKK FORSLAG NÅR MAN KLIKKER UTENFOR
+  ---------------------------------------------------------
+*/
+
+document.addEventListener(
+  "click",
+  (event) => {
+    if (
+      !guestSearchInput ||
+      !guestSearchResults
+    ) {
+      return;
+    }
+
+    const clickedInsideSearch =
+      event.target.closest(
+        ".guest-search-field"
+      );
+
+    if (
+      clickedInsideSearch
+    ) {
+      return;
+    }
+
+    guestSearchResults.innerHTML = "";
+
+    guestSearchResults.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    guestSearchInput.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+  }
+);
+
+
+/*
+  ---------------------------------------------------------
+  RSVP-INNSENDING — FORELØPIG TESTMODUS
+  ---------------------------------------------------------
+*/
+
+if (rsvpForm) {
+  rsvpForm.addEventListener(
+    "submit",
+    (event) => {
+      event.preventDefault();
+
+      if (!selectedGuest) {
+        setFormStatus(
+          "Velg navnet ditt før du sender svaret.",
+          "error"
+        );
+
+        if (guestSearchInput) {
+          guestSearchInput.focus();
+        }
+
+        return;
+      }
+
+      if (
+        !attendanceYes?.checked &&
+        !attendanceNo?.checked
+      ) {
+        setFormStatus(
+          "Velg om du kommer eller ikke.",
+          "error"
+        );
+
+        return;
+      }
 
       const formData =
-        new FormData(rsvpForm);
+        new FormData(
+          rsvpForm
+        );
 
+      const payload = {};
 
-      const payload =
-        formDataToObject(formData);
+      formData.forEach(
+        (value, key) => {
+          payload[key] =
+            value;
+        }
+      );
 
+      /*
+        Vi legger inn systemverdier
+        som kommer fra registeret.
+      */
+      payload.guestId =
+        selectedGuest.id;
+
+      payload.invitationId =
+        selectedGuest.invitationId;
+
+      payload.partySize =
+        selectedGuest.partySize;
+
+      payload.invitedGuests =
+        getInvitationGuests(
+          selectedGuest.invitationId
+        ).map(
+          (guest) => guest.name
+        );
 
       payload.submittedAt =
         new Date().toISOString();
 
+      /*
+        Foreløpig tester vi bare at
+        hele objektet er riktig.
+      */
+      console.table(
+        payload
+      );
 
-      if (
-        RSVP_ENDPOINT ===
-        "DIN_BACKEND_ADRESSE_KOMMER_HER"
-      ) {
-
-        console.table(payload);
-
-        setFormStatus(
-          "Skjemaet fungerer, men står foreløpig i testmodus. Svaret er derfor ikke sendt ennå.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      try {
-
-        submitButton.disabled =
-          true;
-
-        submitButton.textContent =
-          "Sender …";
-
-        setFormStatus(
-          "Sender svaret …"
-        );
-
-
-        const response =
-          await fetch(
-            RSVP_ENDPOINT,
-            {
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-
-              body:
-                JSON.stringify(payload)
-            }
-          );
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            `Serveren svarte med status ${response.status}`
-          );
-
-        }
-
-
-        setFormStatus(
-          "Tusen takk! Svaret deres er registrert.",
-          "success"
-        );
-
-
-        rsvpForm.reset();
-
-
-        window.setTimeout(
-          closeRsvpModal,
-          2500
-        );
-
-      } catch (error) {
-
-        console.error(
-          "RSVP-feil:",
-          error
-        );
-
-
-        setFormStatus(
-          "Vi klarte ikke å sende svaret. Prøv igjen, eller ta kontakt med Pernille eller Andreas.",
-          "error"
-        );
-
-      } finally {
-
-        submitButton.disabled =
-          false;
-
-        submitButton.textContent =
-          "Send svar";
-
-      }
-
+      setFormStatus(
+        "Svarskjemaet er klart. Innsending kobles til senere.",
+        "success"
+      );
     }
   );
-
 }
 
+
+/*
+  ---------------------------------------------------------
+  STARTTILSTAND
+  ---------------------------------------------------------
+*/
+
+resetRsvpSelection();
 
 updateHeader();
 updateActiveSection();
