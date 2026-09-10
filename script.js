@@ -1,3 +1,938 @@
+/*
+  =========================================================
+  GJESTEREGISTER
+  =========================================================
+
+  Dette er fasiten for hvem som er invitert sammen.
+
+  invitationId:
+    Samme ID = samme invitasjon / samme husstand.
+
+  partySize:
+    Hvor mange personer denne invitasjonen gjelder.
+
+  partnerId:
+    guest_id til den andre inviterte personen.
+    null = ingen koblet gjest.
+
+  rsvpEnabled:
+    TRUE = personen kan identifisere seg i RSVP.
+    FALSE = intern person / skal ikke kunne svare.
+*/
+
+const GUESTS = [
+  {
+    id: "G001",
+    name: "Andreas Røst Tonning",
+    firstName: "Andreas",
+    lastName: "Røst Tonning",
+    group: "Andreas Familie",
+    invitationId: "INTERNAL",
+    partySize: 0,
+    partnerId: null,
+    rsvpEnabled: false
+  },
+  {
+    id: "G002",
+    name: "Bente Andersen",
+    firstName: "Bente",
+    lastName: "Andersen",
+    group: "Andreas Familie",
+    invitationId: "INV001",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G003",
+    name: "Christopher Svee Hestnes",
+    firstName: "Christopher",
+    lastName: "Svee Hestnes",
+    group: "Andreas Familie",
+    invitationId: "INV002",
+    partySize: 2,
+    partnerId: "G007",
+    rsvpEnabled: true
+  },
+  {
+    id: "G004",
+    name: "Elisabeth Røst Tonning",
+    firstName: "Elisabeth",
+    lastName: "Røst Tonning",
+    group: "Andreas Familie",
+    invitationId: "INV003",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G005",
+    name: "Helle Røst Tonning",
+    firstName: "Helle",
+    lastName: "Røst Tonning",
+    group: "Andreas Familie",
+    invitationId: "INV004",
+    partySize: 2,
+    partnerId: "G011",
+    rsvpEnabled: true
+  },
+  {
+    id: "G006",
+    name: "Jarl Tonning",
+    firstName: "Jarl",
+    lastName: "Tonning",
+    group: "Andreas Familie",
+    invitationId: "INV005",
+    partySize: 2,
+    partnerId: "G010",
+    rsvpEnabled: true
+  },
+  {
+    id: "G007",
+    name: "Lena Røst Tonning",
+    firstName: "Lena",
+    lastName: "Røst Tonning",
+    group: "Andreas Familie",
+    invitationId: "INV002",
+    partySize: 2,
+    partnerId: "G003",
+    rsvpEnabled: true
+  },
+  {
+    id: "G008",
+    name: "Stein Knut Tonning",
+    firstName: "Stein Knut",
+    lastName: "Tonning",
+    group: "Andreas Familie",
+    invitationId: "INV006",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G009",
+    name: "Terje Røst",
+    firstName: "Terje",
+    lastName: "Røst",
+    group: "Andreas Familie",
+    invitationId: "INV007",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G010",
+    name: "Tone Tonning",
+    firstName: "Tone",
+    lastName: "Tonning",
+    group: "Andreas Familie",
+    invitationId: "INV005",
+    partySize: 2,
+    partnerId: "G006",
+    rsvpEnabled: true
+  },
+  {
+    id: "G011",
+    name: "Vemund Bakken Eide",
+    firstName: "Vemund",
+    lastName: "Bakken Eide",
+    group: "Andreas Familie",
+    invitationId: "INV004",
+    partySize: 2,
+    partnerId: "G005",
+    rsvpEnabled: true
+  },
+
+  {
+    id: "G012",
+    name: "Anita Bagøien",
+    firstName: "Anita",
+    lastName: "Bagøien",
+    group: "Pernille Familie",
+    invitationId: "INV008",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G013",
+    name: "Ann Kristin Bagøien",
+    firstName: "Ann Kristin",
+    lastName: "Bagøien",
+    group: "Pernille Familie",
+    invitationId: "INV009",
+    partySize: 2,
+    partnerId: "G018",
+    rsvpEnabled: true
+  },
+  {
+    id: "G014",
+    name: "Anne-Synnøve Svalby",
+    firstName: "Anne-Synnøve",
+    lastName: "Svalby",
+    group: "Pernille Familie",
+    invitationId: "INV010",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G015",
+    name: "Asbjørn Bagøien",
+    firstName: "Asbjørn",
+    lastName: "Bagøien",
+    group: "Pernille Familie",
+    invitationId: "INV011",
+    partySize: 2,
+    partnerId: "G021",
+    rsvpEnabled: true
+  },
+  {
+    id: "G016",
+    name: "Bendik Bertelsen",
+    firstName: "Bendik",
+    lastName: "Bertelsen",
+    group: "Pernille Familie",
+    invitationId: "INV012",
+    partySize: 2,
+    partnerId: "G019",
+    rsvpEnabled: true
+  },
+  {
+    id: "G017",
+    name: "Benedikte Winther Bagøien",
+    firstName: "Benedikte Winther",
+    lastName: "Bagøien",
+    group: "Pernille Familie",
+    invitationId: "INV013",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G018",
+    name: "Bård Winther Bagøien",
+    firstName: "Bård Winther",
+    lastName: "Bagøien",
+    group: "Pernille Familie",
+    invitationId: "INV009",
+    partySize: 2,
+    partnerId: "G013",
+    rsvpEnabled: true
+  },
+  {
+    id: "G019",
+    name: "Emma Bagøien Wik",
+    firstName: "Emma",
+    lastName: "Bagøien Wik",
+    group: "Pernille Familie",
+    invitationId: "INV012",
+    partySize: 2,
+    partnerId: "G016",
+    rsvpEnabled: true
+  },
+  {
+    id: "G020",
+    name: "Håkon Torvik Svalby",
+    firstName: "Håkon Torvik",
+    lastName: "Svalby",
+    group: "Pernille Familie",
+    invitationId: "INV014",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G021",
+    name: "Ingrid Berdal",
+    firstName: "Ingrid",
+    lastName: "Berdal",
+    group: "Pernille Familie",
+    invitationId: "INV011",
+    partySize: 2,
+    partnerId: "G015",
+    rsvpEnabled: true
+  },
+  {
+    id: "G022",
+    name: "Lena Winther Bagøien",
+    firstName: "Lena Winther",
+    lastName: "Bagøien",
+    group: "Pernille Familie",
+    invitationId: "INV015",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G023",
+    name: "Lise Marie Bagøien",
+    firstName: "Lise Marie",
+    lastName: "Bagøien",
+    group: "Pernille Familie",
+    invitationId: "INV016",
+    partySize: 2,
+    partnerId: "G024",
+    rsvpEnabled: true
+  },
+  {
+    id: "G024",
+    name: "Marianne Næss",
+    firstName: "Marianne",
+    lastName: "Næss",
+    group: "Pernille Familie",
+    invitationId: "INV016",
+    partySize: 2,
+    partnerId: "G023",
+    rsvpEnabled: true
+  },
+  {
+    id: "G025",
+    name: "Michelle Krogstad",
+    firstName: "Michelle",
+    lastName: "Krogstad",
+    group: "Pernille Familie",
+    invitationId: "INV017",
+    partySize: 2,
+    partnerId: "G028",
+    rsvpEnabled: true
+  },
+  {
+    id: "G026",
+    name: "Pernille Winther Svalby",
+    firstName: "Pernille",
+    lastName: "Winther Svalby",
+    group: "Pernille Familie",
+    invitationId: "INTERNAL",
+    partySize: 0,
+    partnerId: null,
+    rsvpEnabled: false
+  },
+  {
+    id: "G027",
+    name: "Petter Torvik Svalby",
+    firstName: "Petter Torvik",
+    lastName: "Svalby",
+    group: "Pernille Familie",
+    invitationId: "INV018",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G028",
+    name: "Robert Rolandsen",
+    firstName: "Robert",
+    lastName: "Rolandsen",
+    group: "Pernille Familie",
+    invitationId: "INV017",
+    partySize: 2,
+    partnerId: "G025",
+    rsvpEnabled: true
+  },
+  {
+    id: "G029",
+    name: "Synnøve Svalby",
+    firstName: "Synnøve",
+    lastName: "Svalby",
+    group: "Pernille Familie",
+    invitationId: "INV019",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+
+  {
+    id: "G030",
+    name: "Abubakar Bamboye",
+    firstName: "Abubakar",
+    lastName: "Bamboye",
+    group: "Venner Andreas",
+    invitationId: "INV020",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G031",
+    name: "Andreas Aalberg",
+    firstName: "Andreas",
+    lastName: "Aalberg",
+    group: "Venner Andreas",
+    invitationId: "INV021",
+    partySize: 2,
+    partnerId: "G033",
+    rsvpEnabled: true
+  },
+  {
+    id: "G032",
+    name: "Dag Ingebritsen",
+    firstName: "Dag",
+    lastName: "Ingebritsen",
+    group: "Venner Andreas",
+    invitationId: "INV022",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G033",
+    name: "Dorthe Sofie Bjørnsdatter Sletten",
+    firstName: "Dorthe Sofie",
+    lastName: "Bjørnsdatter Sletten",
+    group: "Venner Andreas",
+    invitationId: "INV021",
+    partySize: 2,
+    partnerId: "G031",
+    rsvpEnabled: true
+  },
+  {
+    id: "G034",
+    name: "Edoardo Pierucci",
+    firstName: "Edoardo",
+    lastName: "Pierucci",
+    group: "Venner Andreas",
+    invitationId: "INV023",
+    partySize: 2,
+    partnerId: "G046",
+    rsvpEnabled: true
+  },
+  {
+    id: "G035",
+    name: "Eirin Fuglstad Løkken",
+    firstName: "Eirin",
+    lastName: "Fuglstad Løkken",
+    group: "Venner Andreas",
+    invitationId: "INV024",
+    partySize: 2,
+    partnerId: "G062",
+    rsvpEnabled: true
+  },
+  {
+    id: "G036",
+    name: "Erik Amdam Pettersen",
+    firstName: "Erik Amdam",
+    lastName: "Pettersen",
+    group: "Venner Andreas",
+    invitationId: "INV025",
+    partySize: 2,
+    partnerId: "G066",
+    rsvpEnabled: true
+  },
+  {
+    id: "G037",
+    name: "Erik Haug",
+    firstName: "Erik",
+    lastName: "Haug",
+    group: "Venner Andreas",
+    invitationId: "INV026",
+    partySize: 2,
+    partnerId: "G041",
+    rsvpEnabled: true
+  },
+  {
+    id: "G038",
+    name: "Erling Østgård",
+    firstName: "Erling",
+    lastName: "Østgård",
+    group: "Venner Andreas",
+    invitationId: "INV027",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G039",
+    name: "Henrik Storli",
+    firstName: "Henrik",
+    lastName: "Storli",
+    group: "Venner Andreas",
+    invitationId: "INV028",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G040",
+    name: "Isabelle Hove",
+    firstName: "Isabelle",
+    lastName: "Hove",
+    group: "Venner Andreas",
+    invitationId: "INV029",
+    partySize: 2,
+    partnerId: "G053",
+    rsvpEnabled: true
+  },
+  {
+    id: "G041",
+    name: "Iselin Ween Rustad",
+    firstName: "Iselin",
+    lastName: "Ween Rustad",
+    group: "Venner Andreas",
+    invitationId: "INV026",
+    partySize: 2,
+    partnerId: "G037",
+    rsvpEnabled: true
+  },
+  {
+    id: "G042",
+    name: "Ivar Magnus Bakken Simonsen",
+    firstName: "Ivar Magnus",
+    lastName: "Bakken Simonsen",
+    group: "Venner Andreas",
+    invitationId: "INV030",
+    partySize: 2,
+    partnerId: "G050",
+    rsvpEnabled: true
+  },
+  {
+    id: "G043",
+    name: "Jamal Osman",
+    firstName: "Jamal",
+    lastName: "Osman",
+    group: "Venner Andreas",
+    invitationId: "INV031",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G044",
+    name: "Jeanette Luna Pettersen",
+    firstName: "Jeanette Luna",
+    lastName: "Pettersen",
+    group: "Venner Andreas",
+    invitationId: "INV032",
+    partySize: 2,
+    partnerId: "G045",
+    rsvpEnabled: true
+  },
+  {
+    id: "G045",
+    name: "Kim-Alexsander Hjelmeseth",
+    firstName: "Kim-Alexsander",
+    lastName: "Hjelmeseth",
+    group: "Venner Andreas",
+    invitationId: "INV032",
+    partySize: 2,
+    partnerId: "G044",
+    rsvpEnabled: true
+  },
+  {
+    id: "G046",
+    name: "Francisca Ramos",
+    firstName: "Francisca",
+    lastName: "Ramos",
+    group: "Venner Andreas",
+    invitationId: "INV023",
+    partySize: 2,
+    partnerId: "G034",
+    rsvpEnabled: true
+  },
+  {
+    id: "G047",
+    name: "Kristian Neziri",
+    firstName: "Kristian",
+    lastName: "Neziri",
+    group: "Venner Andreas",
+    invitationId: "INV033",
+    partySize: 2,
+    partnerId: "G057",
+    rsvpEnabled: true
+  },
+  {
+    id: "G048",
+    name: "Kristoffer Sletten",
+    firstName: "Kristoffer",
+    lastName: "Sletten",
+    group: "Venner Andreas",
+    invitationId: "INV034",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G049",
+    name: "Magne Risnes",
+    firstName: "Magne",
+    lastName: "Risnes",
+    group: "Venner Andreas",
+    invitationId: "INV035",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G050",
+    name: "Maja Holm",
+    firstName: "Maja",
+    lastName: "Holm",
+    group: "Venner Andreas",
+    invitationId: "INV030",
+    partySize: 2,
+    partnerId: "G042",
+    rsvpEnabled: true
+  },
+  {
+    id: "G051",
+    name: "Marcin Zemlo",
+    firstName: "Marcin",
+    lastName: "Zemlo",
+    group: "Venner Andreas",
+    invitationId: "INV036",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G052",
+    name: "Marianne Gull",
+    firstName: "Marianne",
+    lastName: "Gull",
+    group: "Venner Andreas",
+    invitationId: "INV037",
+    partySize: 2,
+    partnerId: "G058",
+    rsvpEnabled: true
+  },
+  {
+    id: "G053",
+    name: "Martin Hove",
+    firstName: "Martin",
+    lastName: "Hove",
+    group: "Venner Andreas",
+    invitationId: "INV029",
+    partySize: 2,
+    partnerId: "G040",
+    rsvpEnabled: true
+  },
+  {
+    id: "G054",
+    name: "Mathias Munkvik",
+    firstName: "Mathias",
+    lastName: "Munkvik",
+    group: "Venner Andreas",
+    invitationId: "INV038",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G055",
+    name: "Oliver Monsø",
+    firstName: "Oliver",
+    lastName: "Monsø",
+    group: "Venner Andreas",
+    invitationId: "INV039",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G056",
+    name: "Oskar Ulvang",
+    firstName: "Oskar",
+    lastName: "Ulvang",
+    group: "Venner Andreas",
+    invitationId: "INV040",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G057",
+    name: "Patrycja Sędor",
+    firstName: "Patrycja",
+    lastName: "Sędor",
+    group: "Venner Andreas",
+    invitationId: "INV033",
+    partySize: 2,
+    partnerId: "G047",
+    rsvpEnabled: true
+  },
+  {
+    id: "G058",
+    name: "Robert Tiller",
+    firstName: "Robert",
+    lastName: "Tiller",
+    group: "Venner Andreas",
+    invitationId: "INV037",
+    partySize: 2,
+    partnerId: "G052",
+    rsvpEnabled: true
+  },
+  {
+    id: "G059",
+    name: "Szymon Gradek",
+    firstName: "Szymon",
+    lastName: "Gradek",
+    group: "Venner Andreas",
+    invitationId: "INV041",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G060",
+    name: "Torje Børvik",
+    firstName: "Torje",
+    lastName: "Børvik",
+    group: "Venner Andreas",
+    invitationId: "INV042",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G061",
+    name: "Zak Brennan",
+    firstName: "Zak",
+    lastName: "Brennan",
+    group: "Venner Andreas",
+    invitationId: "INV043",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G062",
+    name: "Ådne Handberg Helmersen",
+    firstName: "Ådne Handberg",
+    lastName: "Helmersen",
+    group: "Venner Andreas",
+    invitationId: "INV024",
+    partySize: 2,
+    partnerId: "G035",
+    rsvpEnabled: true
+  },
+
+  {
+    id: "G063",
+    name: "Alem Brenne",
+    firstName: "Alem",
+    lastName: "Brenne",
+    group: "Venner Pernille",
+    invitationId: "INV044",
+    partySize: 2,
+    partnerId: "G064",
+    rsvpEnabled: true
+  },
+  {
+    id: "G064",
+    name: "Andreas Mørk",
+    firstName: "Andreas",
+    lastName: "Mørk",
+    group: "Venner Pernille",
+    invitationId: "INV044",
+    partySize: 2,
+    partnerId: "G063",
+    rsvpEnabled: true
+  },
+  {
+    id: "G065",
+    name: "Arthiha Arampu",
+    firstName: "Arthiha",
+    lastName: "Arampu",
+    group: "Venner Pernille",
+    invitationId: "INV045",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G066",
+    name: "Eline Ølstad Male",
+    firstName: "Eline",
+    lastName: "Ølstad Male",
+    group: "Venner Pernille",
+    invitationId: "INV025",
+    partySize: 2,
+    partnerId: "G036",
+    rsvpEnabled: true
+  },
+  {
+    id: "G067",
+    name: "Elk Fotograf",
+    firstName: "Elk",
+    lastName: "Fotograf",
+    group: "Venner Pernille",
+    invitationId: "INV046",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G068",
+    name: "Emma Blix",
+    firstName: "Emma",
+    lastName: "Blix",
+    group: "Venner Pernille",
+    invitationId: "INV047",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G069",
+    name: "Frida Sofie Kaaven",
+    firstName: "Frida Sofie",
+    lastName: "Kaaven",
+    group: "Venner Pernille",
+    invitationId: "INV048",
+    partySize: 2,
+    partnerId: "G072",
+    rsvpEnabled: true
+  },
+  {
+    id: "G070",
+    name: "Håkon Graneggen",
+    firstName: "Håkon",
+    lastName: "Graneggen",
+    group: "Venner Pernille",
+    invitationId: "INV049",
+    partySize: 2,
+    partnerId: "G074",
+    rsvpEnabled: true
+  },
+  {
+    id: "G071",
+    name: "Kristine Dalsbø",
+    firstName: "Kristine",
+    lastName: "Dalsbø",
+    group: "Venner Pernille",
+    invitationId: "INV050",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G072",
+    name: "Kristoffer Utsi Johnsen",
+    firstName: "Kristoffer Utsi",
+    lastName: "Johnsen",
+    group: "Venner Pernille",
+    invitationId: "INV048",
+    partySize: 2,
+    partnerId: "G069",
+    rsvpEnabled: true
+  },
+  {
+    id: "G073",
+    name: "Maria Bergby",
+    firstName: "Maria",
+    lastName: "Bergby",
+    group: "Venner Pernille",
+    invitationId: "INV051",
+    partySize: 1,
+    partnerId: null,
+    rsvpEnabled: true
+  },
+  {
+    id: "G074",
+    name: "Nathalia Monstad",
+    firstName: "Nathalia",
+    lastName: "Monstad",
+    group: "Venner Pernille",
+    invitationId: "INV049",
+    partySize: 2,
+    partnerId: "G070",
+    rsvpEnabled: true
+  }
+];
+/*
+  =========================================================
+  RSVP — GJESTESØK
+  =========================================================
+*/
+
+/**
+ * Gjør tekst enklere å søke i.
+ *
+ * Dette gjør at søk også fungerer godt med norske
+ * bokstaver og aksenter.
+ *
+ * Eksempel:
+ *   "Sędor" → "sedor"
+ *   "Østgård" → "ostgard"
+ */
+const normalizeGuestSearch = (value) => {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+};
+
+
+/**
+ * Søker etter gjester.
+ *
+ * Det returneres ingen forslag før brukeren har skrevet
+ * minst 4 tegn.
+ */
+const searchGuests = (query) => {
+  const normalizedQuery =
+    normalizeGuestSearch(query);
+
+  if (normalizedQuery.length < 4) {
+    return [];
+  }
+
+  return GUESTS
+    .filter(
+      (guest) =>
+        guest.rsvpEnabled
+    )
+    .filter(
+      (guest) =>
+        normalizeGuestSearch(guest.name)
+          .includes(normalizedQuery)
+    )
+    .slice(0, 8);
+};
+
+
+/**
+ * Finner én bestemt gjest basert på ID.
+ */
+const getGuestById = (guestId) => {
+  if (!guestId) {
+    return null;
+  }
+
+  return (
+    GUESTS.find(
+      (guest) =>
+        guest.id === guestId
+    ) || null
+  );
+};
+
+
+/**
+ * Finner alle gjester som tilhører samme invitasjon.
+ *
+ * Eksempel:
+ *
+ * Erik Haug → INV026
+ *
+ * Resultat:
+ * Erik Haug
+ * Iselin Ween Rustad
+ */
+const getInvitationGuests = (
+  invitationId
+) => {
+  if (!invitationId) {
+    return [];
+  }
+
+  return GUESTS.filter(
+    (guest) =>
+      guest.rsvpEnabled &&
+      guest.invitationId === invitationId
+  );
+};
 const body =
   document.body;
 
@@ -3245,3 +4180,22 @@ if (mobileReopenInvitationButton) {
   );
 
 }
+console.log(
+  "TEST SØK ERIK:",
+  searchGuests("Erik")
+);
+
+console.log(
+  "TEST SØK SZYM:",
+  searchGuests("Szym")
+);
+
+console.log(
+  "TEST ERIK:",
+  getGuestById("G037")
+);
+
+console.log(
+  "TEST INVITASJON ERIK:",
+  getInvitationGuests("INV026")
+);
