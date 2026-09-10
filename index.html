@@ -973,8 +973,9 @@
   -->
 
   <label class="form-field full-width guest-search-field">
-    <span>Navnet ditt</span>
+  <span>Navnet ditt</span>
 
+  <div class="guest-search-input-wrap">
     <input
       type="text"
       name="guestSearch"
@@ -986,18 +987,27 @@
       data-guest-search
     >
 
-    <small class="field-help">
-      Skriv minst fire bokstaver for å finne navnet ditt.
-    </small>
+    <button
+      type="button"
+      class="guest-search-change"
+      data-change-guest
+      hidden
+    >
+      Endre navn
+    </button>
+  </div>
 
-    <div
-      class="guest-search-results"
-      id="guest-search-results"
-      role="listbox"
-      data-guest-search-results
-    ></div>
+  <small class="field-help">
+    Skriv minst fire bokstaver for å finne navnet ditt.
+  </small>
 
-  </label>
+  <div
+    class="guest-search-results"
+    id="guest-search-results"
+    role="listbox"
+    data-guest-search-results
+  ></div>
+</label>
 
 
   <!--
@@ -1149,7 +1159,21 @@
         >
           Send svar
         </button>
+<div class="rsvp-submit-area" data-rsvp-submit-area hidden>
+  <div
+    class="form-status"
+    role="status"
+    aria-live="polite"
+    data-form-status
+  ></div>
 
+  <button
+    class="form-submit"
+    type="submit"
+  >
+    Send svar
+  </button>
+</div>
       </form>
 
     </div>
