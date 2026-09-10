@@ -957,7 +957,7 @@
         </h2>
 
         <p>
-          Fyll ut ett skjema per husstand eller invitasjon.
+          Skriv inn navnet ditt for å finne invitasjonen din.
         </p>
 
       </div>
@@ -967,33 +967,167 @@
 
         <div class="form-grid">
 
-          <label class="form-field">
+  <!--
+    GJESTESØK
+    Først identifiserer gjesten seg selv.
+  -->
 
-            <span>Antall deltakere</span>
+  <label class="form-field full-width guest-search-field">
+    <span>Navnet ditt</span>
 
-            <input
-              type="number"
-              name="participantCount"
-              min="1"
-              max="10"
-              required
-            >
+    <input
+      type="text"
+      name="guestSearch"
+      autocomplete="off"
+      placeholder="Skriv navnet ditt"
+      aria-autocomplete="list"
+      aria-controls="guest-search-results"
+      aria-expanded="false"
+      data-guest-search
+    >
 
-          </label>
+    <small class="field-help">
+      Skriv minst fire bokstaver for å finne navnet ditt.
+    </small>
+
+    <div
+      class="guest-search-results"
+      id="guest-search-results"
+      role="listbox"
+      data-guest-search-results
+    ></div>
+
+  </label>
 
 
-          <label class="form-field">
+  <!--
+    VALGT INVITASJON
+    Denne delen er skjult frem til en gjest
+    har valgt navnet sitt.
+  -->
 
-            <span>Telefonnummer</span>
+  <div
+    class="rsvp-details"
+    data-rsvp-details
+    hidden
+  >
 
-            <input
-              type="tel"
-              name="phone"
-              autocomplete="tel"
-              required
-            >
+    <div class="rsvp-guests">
+      <p class="inside-heading">
+        Dere er invitert
+      </p>
 
-          </label>
+      <div
+        class="rsvp-guest-list"
+        data-rsvp-guest-list
+      ></div>
+    </div>
+
+
+    <fieldset class="rsvp-response-field">
+      <legend>Kommer dere i bryllupet?</legend>
+
+      <label>
+        <input
+          type="radio"
+          name="attendance"
+          value="Ja"
+          required
+          data-attendance-yes
+        >
+        <span>Ja, vi kommer</span>
+      </label>
+
+      <label>
+        <input
+          type="radio"
+          name="attendance"
+          value="Nei"
+          required
+          data-attendance-no
+        >
+        <span>Nei, vi kan dessverre ikke komme</span>
+      </label>
+    </fieldset>
+
+
+    <div
+      class="rsvp-additional-fields"
+      data-rsvp-additional-fields
+      hidden
+    >
+
+      <label class="form-field full-width">
+        <span>Allergier</span>
+
+        <textarea
+          name="allergies"
+          rows="3"
+          placeholder="Skriv «ingen» dersom ingen har allergier"
+        ></textarea>
+      </label>
+
+
+      <label class="form-field full-width">
+        <span>Kostholdspreferanser</span>
+
+        <textarea
+          name="dietaryPreferences"
+          rows="3"
+          placeholder="For eksempel vegetarisk, vegansk eller annet"
+        ></textarea>
+      </label>
+
+
+      <fieldset class="form-field full-width radio-field">
+        <legend>
+          Ønskes alkoholfri drikke til maten?
+        </legend>
+
+        <label>
+          <input
+            type="radio"
+            name="alcoholFree"
+            value="Ja"
+          >
+          <span>Ja</span>
+        </label>
+
+        <label>
+          <input
+            type="radio"
+            name="alcoholFree"
+            value="Nei"
+          >
+          <span>Nei</span>
+        </label>
+
+        <label>
+          <input
+            type="radio"
+            name="alcoholFree"
+            value="Noen av deltakerne"
+          >
+          <span>Noen av deltakerne</span>
+        </label>
+      </fieldset>
+
+
+      <label class="form-field full-width">
+        <span>Andre opplysninger</span>
+
+        <textarea
+          name="additionalInformation"
+          rows="4"
+          placeholder="Er det noe annet vi bør ta hensyn til?"
+        ></textarea>
+      </label>
+
+    </div>
+
+  </div>
+
+</div>
 
 
           <label class="form-field full-width">
